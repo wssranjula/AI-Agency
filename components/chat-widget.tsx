@@ -6,6 +6,19 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Send, X, Trash2, Bot, ChevronUp, ChevronDown } from 'lucide-react'
 
+async function query(data) {
+  const response = await fetch(
+    "http://localhost:3000/api/v1/prediction/ac249b08-f4ed-40d0-a493-94bba72a8d20",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    }
+  );
+  const result = await response.json();
+  return result;
+}
+
 export default function ChatWidget() {
   const initialMessage = { text: "Welcome! I'm an AI assistant. How can I help you today?", sender: 'bot' as const }
   const [isOpen, setIsOpen] = useState(false)
@@ -13,6 +26,7 @@ export default function ChatWidget() {
   const [inputMessage, setInputMessage] = useState('')
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(true)
   const [showSuggestions, setShowSuggestions] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [sampleMessages] = useState([
     "What services do you offer?",
     "How can I contact support?",
@@ -45,25 +59,44 @@ export default function ChatWidget() {
     setShowWelcomeMessage(false)
   }
 
-  const sendMessage = (e: React.FormEvent) => {
+  const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (inputMessage.trim()) {
-      setMessages([...messages, { text: inputMessage, sender: 'user' }])
+    if (inputMessage.trim() && !isLoading) {
+      const userMessage = { text: inputMessage, sender: 'user' as const }
+      setMessages(prev => [...prev, userMessage])
       setInputMessage('')
-      // Simulate bot response
-      setTimeout(() => {
-        setMessages(prev => [...prev, { text: "Thanks for your message! I'm here to assist you. What would you like to know?", sender: 'bot' }])
-      }, 1000)
+      setIsLoading(true)
+
+      try {
+        const response = await query({ question: inputMessage })
+        const botMessage = { text: response.text, sender: 'bot' as const }
+        setMessages(prev => [...prev, botMessage])
+      } catch (error) {
+        console.error('Error fetching response:', error)
+        const errorMessage = { text: "Sorry, I'm having trouble responding right now. Please try again later.", sender: 'bot' as const }
+        setMessages(prev => [...prev, errorMessage])
+      } finally {
+        setIsLoading(false)
+      }
     }
   }
 
-  const handleSampleMessage = (message: string) => {
-    setMessages([...messages, { text: message, sender: 'user' }])
+  const handleSampleMessage = async (message: string) => {
+    setMessages(prev => [...prev, { text: message, sender: 'user' }])
     setShowSuggestions(false)
-    // Simulate bot response
-    setTimeout(() => {
-      setMessages(prev => [...prev, { text: "I'd be happy to help with that! Let me find the information for you.", sender: 'bot' }])
-    }, 1000)
+    setIsLoading(true)
+
+    try {
+      const response = await query({ question: message })
+      const botMessage = { text: response.text, sender: 'bot' as const }
+      setMessages(prev => [...prev, botMessage])
+    } catch (error) {
+      console.error('Error fetching response:', error)
+      const errorMessage = { text: "Sorry, I'm having trouble responding right now. Please try again later.", sender: 'bot' as const }
+      setMessages(prev => [...prev, errorMessage])
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const clearMessages = () => {
@@ -77,7 +110,7 @@ export default function ChatWidget() {
   return (
     <div className="fixed bottom-0 right-0 left-0 sm:bottom-8 sm:right-8 sm:left-auto z-50">
       {isOpen ? (
-        <Card className="w-full sm:w-[400px] md:w-[00px] lg:w-[600px] h-[90vh] sm:h-[800px] flex flex-col shadow-lg rounded-none sm:rounded-lg">
+        <Card className="w-full sm:w-[400px] md:w-[500px] lg:w-[600px] h-[90vh] sm:h-[800px] flex flex-col shadow-lg rounded-none sm:rounded-lg">
           <CardHeader className="flex flex-row items-center justify-between p-4 bg-purple-600 text-white">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-purple-600">
@@ -104,6 +137,13 @@ export default function ChatWidget() {
                 </div>
               </div>
             ))}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="bg-gray-200 text-gray-800 p-3 rounded-lg text-sm">
+                  Thinking...
+                </div>
+              </div>
+            )}
             <div ref={messagesEndRef} />
           </CardContent>
           <div className="border-t">
@@ -124,6 +164,7 @@ export default function ChatWidget() {
                     size="sm"
                     onClick={() => handleSampleMessage(message)}
                     className="w-full text-xs justify-start h-auto py-2 px-3"
+                    disabled={isLoading}
                   >
                     {message}
                   </Button>
@@ -138,8 +179,9 @@ export default function ChatWidget() {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 className="flex-grow text-sm"
+                disabled={isLoading}
               />
-              <Button type="submit" size="icon" className="bg-purple-600 hover:bg-purple-700 h-10 w-10">
+              <Button type="submit" size="icon" className="bg-purple-600 hover:bg-purple-700 h-10 w-10" disabled={isLoading}>
                 <Send className="h-5 w-5" />
               </Button>
             </form>
@@ -149,7 +191,7 @@ export default function ChatWidget() {
         <div className="relative flex flex-col items-end p-4">
           {showWelcomeMessage && (
             <div className="mb-2 p-3 bg-white rounded-lg shadow-lg text-sm whitespace-nowrap animate-fade-in-down">
-              Hi there! 👋 Need any help? I&apos;m here to assist you!
+              Hi there! 👋 Need any help? I'm here to assist you!
             </div>
           )}
           <Button 
