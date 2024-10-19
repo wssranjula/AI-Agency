@@ -5,7 +5,7 @@ import Calendly from "./calendly";
 import ShowcaseNavbar from "@/components/showcase-navbar";
 import { PiCheckCircle } from "react-icons/pi";
 import { motion } from "framer-motion";
-
+import { AnimatedShinyTextDemo } from "@/components/demos/animated-shiny-text-demo";
 const checkItemVariants = {
   hidden: { opacity: 0, x: -50 },
   visible: { opacity: 1, x: 0 },
@@ -68,6 +68,7 @@ const Meeting = () => {
                   </ul>
                 </motion.div>
               ))}
+              <AnimatedShinyTextDemo/>
         </div>
 
     <div className="md:w-1/2">

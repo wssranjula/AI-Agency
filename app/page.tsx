@@ -144,7 +144,7 @@ export default function Home() {
 
       <main className="md:pb-10">
         <div className="md:px-0 mx-6 xl:w-4/5 2xl:w-[68%] md:mx-auto mt-14">
-          <AnimatedShinyTextDemo />
+          {/* <AnimatedShinyTextDemo /> */}
 
           <h1>
             <CoverDemo />
@@ -153,8 +153,7 @@ export default function Home() {
             className="md:text-center
            text-xl md:text-2xl my-6 md:my-10 md:w-4/5 mx-auto text-gray-500"
           >
-            Schedule a call with us to discuss your project or chat with our AI
-            to get more info
+          Discover how AI can transform your business - Book a consultation or try our AI assistant
           </p>
 
           <div
@@ -205,25 +204,25 @@ export default function Home() {
             <BoxReveal boxColor={"#3b82f6"} duration={0.5}>
               <p className="md:text-xl font-semibold flex gap-x-2 md:gap-x-4 items-center">
                 <PiCheckBold className="text-xl text-blue-500" />
-                Analyze
+                Assess: We analyze your business needs and opportunities 
               </p>
             </BoxReveal>
             <BoxReveal boxColor={"#3b82f6"} duration={0.5}>
               <p className="md:text-xl font-semibold flex gap-x-2 md:gap-x-4 items-center">
                 <PiCheckBold className="text-xl text-blue-500" />
-                Develop
+                Strategize: We develop a custom AI implementation plan
               </p>
             </BoxReveal>
             <BoxReveal boxColor={"#3b82f6"} duration={0.5}>
               <p className="md:text-xl font-semibold flex gap-x-2 md:gap-x-4 items-center">
                 <PiCheckBold className="text-xl text-blue-500" />
-                Deploy
+                Implement: We deploy tailored AI solutions seamlessly
               </p>
             </BoxReveal>
             <BoxReveal boxColor={"#3b82f6"} duration={0.5}>
               <p className="md:text-xl font-semibold flex gap-x-2 md:gap-x-4 items-center">
                 <PiCheckBold className="text-xl text-blue-500" />
-                Optimize
+                Evolve: We continuously optimize for maximum ROI"
               </p>
             </BoxReveal>
           </div>
