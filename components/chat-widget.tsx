@@ -149,7 +149,7 @@ export default function ChatWidget() {
         <div className="relative flex flex-col items-end p-4">
           {showWelcomeMessage && (
             <div className="mb-2 p-3 bg-white rounded-lg shadow-lg text-sm whitespace-nowrap animate-fade-in-down">
-              Hi there! 👋 Need any help? I'm here to assist you!
+              Hi there! 👋 Need any help? I&apos;m here to assist you!
             </div>
           )}
           <Button 
