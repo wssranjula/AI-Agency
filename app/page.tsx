@@ -16,7 +16,7 @@ import { Link as ScrollLink, Element } from "react-scroll";
 import { IconStarFilled } from "@tabler/icons-react";
 import { ShootingStarsAndStarsBackgroundDemo } from "@/components/demos/shooting-stars-demo";
 import LetsMakeThingsHappenSection from "@/components/ui/lets-make-things-happen";
-
+import ChatWidget from "@/components/chat-widget";
 
 const services = [
   {
@@ -153,8 +153,8 @@ export default function Home() {
             className="md:text-center
            text-xl md:text-2xl my-6 md:my-10 md:w-4/5 mx-auto text-gray-500"
           >
-            Schedule a call with us to discuss your project or chat with our AI  to get more info
-            
+            Schedule a call with us to discuss your project or chat with our AI
+            to get more info
           </p>
 
           <div
@@ -265,7 +265,8 @@ export default function Home() {
                   {
                     logo: "/logo/langchain.svg",
                     name: "langchain",
-                  },                  {
+                  },
+                  {
                     logo: "/logo/openai.png",
                     name: "openai",
                   },
@@ -284,7 +285,7 @@ export default function Home() {
                   {
                     logo: "/logo/zapier.png",
                     name: "zapier",
-                  },                  
+                  },
                 ]}
               />
             </section>
@@ -294,14 +295,14 @@ export default function Home() {
 
       <Element name="services">
         <div className="md:px-0 mx-6 xl:w-4/5 2xl:w-[68%] md:mx-auto ">
-        <h1>
-          <WordPullUpDemo />
-        </h1>
-        <p className="md:text-center py-4 md:w-1/2 mx-auto text-xl md:text-2xl text-gray-500">
-        All of our services are designed to help your business stand out 
-        </p>
+          <h1>
+            <WordPullUpDemo />
+          </h1>
+          <p className="md:text-center py-4 md:w-1/2 mx-auto text-xl md:text-2xl text-gray-500">
+            All of our services are designed to help your business stand out
+          </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-10">
             {services.map((service) => (
               <div
                 key={service.title}
@@ -328,8 +329,8 @@ export default function Home() {
 
       <Element name="process">
         <main className="md:px-0 mx-6 md:mx-auto">
-        <h1 className="text-3xl md:text-5xl md:text-center font-medium flex items-center gap-x-2 mx-auto justify-center">
-        Our{" "}
+          <h1 className="text-3xl md:text-5xl md:text-center font-medium flex items-center gap-x-2 mx-auto justify-center">
+            Our{" "}
             <span className="text-blue-500 flex gap-x-1 items-center">
               {" "}
               <Image
@@ -351,23 +352,23 @@ export default function Home() {
             Process
           </h1>
 
-          <p className="text-center 
+          <p
+            className="text-center 
           py-4 md:w-1/2 mx-auto 
-          text-xl md:text-2xl text-gray-500">
+          text-xl md:text-2xl text-gray-500"
+          >
             All of our services are designed to help your business to get
             noticed.
           </p>
 
           <div className="flex flex-col md:flex-row items-center justify-center w-full md:w-1/2 mx-auto">
-          <div className="w-full md:w-1/2 order-2 md:order-1">
-            <AnimatedBeamMultipleOutputDemo />
+            <div className="w-full md:w-1/2 order-2 md:order-1">
+              <AnimatedBeamMultipleOutputDemo />
+            </div>
+            <div className="w-full md:w-1/2 order-1 md:order-2 md:ml-0">
+              <BoxRevealDemo />
+            </div>
           </div>
-          <div className="w-full md:w-1/2 order-1 md:order-2 md:ml-0">
-            <BoxRevealDemo />
-          </div>
-
-          </div>
-
         </main>
       </Element>
 
@@ -382,10 +383,9 @@ export default function Home() {
           /> */}
           <div className="flex flex-col gap-y-5 md:w-1/2">
             <h1 className="text-lg md:text-2xl ">
-              &quot;We&apos;ve able to change out business in big way
-              &apos;ve been amazing to work with. They&apos;ve helped us
-              grow our business and we couldn&apos;t be happier with the
-              results. &quot;
+              &quot;We&apos;ve able to change out business in big way &apos;ve
+              been amazing to work with. They&apos;ve helped us grow our
+              business and we couldn&apos;t be happier with the results. &quot;
             </h1>
             <div className="flex items-center gap-x-1">
               <IconStarFilled className="text-4xl text-yellow-500" />
@@ -402,8 +402,8 @@ export default function Home() {
           </div>
           <div className="flex flex-col gap-y-5 md:w-1/2">
             <h1 className="text-lg md:text-2xl ">
-              &quot;We&apos;ve been working with Intelliflow for over 1 years and
-              they&apos;ve been amazing to work with. They&apos;ve helped us
+              &quot;We&apos;ve been working with Intelliflow for over 1 years
+              and they&apos;ve been amazing to work with. They&apos;ve helped us
               grow our business and we couldn&apos;t be happier with the
               results. &quot;
             </h1>
@@ -420,7 +420,6 @@ export default function Home() {
               CEO, Atlas Massage
             </span>
           </div>
-          
         </main>
       </section>
 
@@ -429,7 +428,7 @@ export default function Home() {
       </Element>
 
       <section className="my-10 md:py-20 xl:w-4/5 2xl:w-[68%] md:mx-auto">
-      <LetsMakeThingsHappenSection />
+        <LetsMakeThingsHappenSection />
       </section>
 
       <footer className="bg-[#fafafa] py-10  px-6 md:px-0 md:mx-auto border-t">
@@ -456,6 +455,7 @@ export default function Home() {
           </Link>
         </div>
       </footer>
+      <ChatWidget />
     </div>
   );
 }
