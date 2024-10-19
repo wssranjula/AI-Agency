@@ -4,29 +4,23 @@ import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Send, X, Trash2, Bot, ChevronUp, ChevronDown } from 'lucide-react'
+import { Send, X, Trash2, Bot, ChevronUp, ChevronDown, ChevronDownCircle, Moon, Sun } from 'lucide-react'
+import { FlowiseClient } from 'flowise-sdk'
+import { format } from 'date-fns'
 
-async function query(data) {
-  const response = await fetch(
-    "http://localhost:3000/api/v1/prediction/ac249b08-f4ed-40d0-a493-94bba72a8d20",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    }
-  );
-  const result = await response.json();
-  return result;
-}
+const client = new FlowiseClient({ baseUrl: 'http://localhost:3000' });
 
 export default function ChatWidget() {
-  const initialMessage = { text: "Welcome! I'm an AI assistant. How can I help you today?", sender: 'bot' as const }
+  const initialMessage = { text: "Welcome! I'm an AI assistant. How can I help you today?", sender: 'bot' as const, timestamp: new Date() }
   const [isOpen, setIsOpen] = useState(false)
-  const [messages, setMessages] = useState<{ text: string; sender: 'user' | 'bot' }[]>([initialMessage])
+  const [messages, setMessages] = useState<{ text: string; sender: 'user' | 'bot'; timestamp: Date }[]>([initialMessage])
   const [inputMessage, setInputMessage] = useState('')
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(true)
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isTyping, setIsTyping] = useState(false)
+  const [showScrollButton, setShowScrollButton] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(false)
   const [sampleMessages] = useState([
     "What services do you offer?",
     "How can I contact support?",
@@ -37,6 +31,7 @@ export default function ChatWidget() {
   ])
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const chatContentRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -54,6 +49,18 @@ export default function ChatWidget() {
     return () => clearTimeout(timer)
   }, [])
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (chatContentRef.current) {
+        const { scrollTop, scrollHeight, clientHeight } = chatContentRef.current
+        setShowScrollButton(scrollHeight - scrollTop > clientHeight + 100)
+      }
+    }
+
+    chatContentRef.current?.addEventListener('scroll', handleScroll)
+    return () => chatContentRef.current?.removeEventListener('scroll', handleScroll)
+  }, [])
+
   const toggleChat = () => {
     setIsOpen(!isOpen)
     setShowWelcomeMessage(false)
@@ -62,40 +69,80 @@ export default function ChatWidget() {
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
     if (inputMessage.trim() && !isLoading) {
-      const userMessage = { text: inputMessage, sender: 'user' as const }
+      const userMessage = { text: inputMessage, sender: 'user' as const, timestamp: new Date() }
       setMessages(prev => [...prev, userMessage])
       setInputMessage('')
       setIsLoading(true)
+      setIsTyping(true)
 
       try {
-        const response = await query({ question: inputMessage })
-        const botMessage = { text: response.text, sender: 'bot' as const }
-        setMessages(prev => [...prev, botMessage])
+        const prediction = await client.createPrediction({
+          chatflowId: 'ac249b08-f4ed-40d0-a493-94bba72a8d20', // Replace with your actual chatflow ID
+          question: inputMessage,
+          streaming: true,
+        });
+
+        let botResponse = '';
+        for await (const chunk of prediction) {
+          if (chunk.event === 'token') {
+            botResponse += chunk.data;
+            setMessages(prev => {
+              const newMessages = [...prev];
+              if (newMessages[newMessages.length - 1].sender === 'bot') {
+                newMessages[newMessages.length - 1].text = botResponse;
+              } else {
+                newMessages.push({ text: botResponse, sender: 'bot', timestamp: new Date() });
+              }
+              return newMessages;
+            });
+          }
+        }
       } catch (error) {
         console.error('Error fetching response:', error)
-        const errorMessage = { text: "Sorry, I'm having trouble responding right now. Please try again later.", sender: 'bot' as const }
+        const errorMessage = { text: "Sorry, I'm having trouble responding right now. Please try again later.", sender: 'bot' as const, timestamp: new Date() }
         setMessages(prev => [...prev, errorMessage])
       } finally {
         setIsLoading(false)
+        setIsTyping(false)
       }
     }
   }
 
   const handleSampleMessage = async (message: string) => {
-    setMessages(prev => [...prev, { text: message, sender: 'user' }])
+    setMessages(prev => [...prev, { text: message, sender: 'user', timestamp: new Date() }])
     setShowSuggestions(false)
     setIsLoading(true)
+    setIsTyping(true)
 
     try {
-      const response = await query({ question: message })
-      const botMessage = { text: response.text, sender: 'bot' as const }
-      setMessages(prev => [...prev, botMessage])
+      const prediction = await client.createPrediction({
+        chatflowId: 'ac249b08-f4ed-40d0-a493-94bba72a8d20', // Replace with your actual chatflow ID
+        question: message,
+        streaming: true,
+      });
+
+      let botResponse = '';
+      for await (const chunk of prediction) {
+        if (chunk.event === 'token') {
+          botResponse += chunk.data;
+          setMessages(prev => {
+            const newMessages = [...prev];
+            if (newMessages[newMessages.length - 1].sender === 'bot') {
+              newMessages[newMessages.length - 1].text = botResponse;
+            } else {
+              newMessages.push({ text: botResponse, sender: 'bot', timestamp: new Date() });
+            }
+            return newMessages;
+          });
+        }
+      }
     } catch (error) {
       console.error('Error fetching response:', error)
-      const errorMessage = { text: "Sorry, I'm having trouble responding right now. Please try again later.", sender: 'bot' as const }
+      const errorMessage = { text: "Sorry, I'm having trouble responding right now. Please try again later.", sender: 'bot' as const, timestamp: new Date() }
       setMessages(prev => [...prev, errorMessage])
     } finally {
       setIsLoading(false)
+      setIsTyping(false)
     }
   }
 
@@ -107,11 +154,15 @@ export default function ChatWidget() {
     setShowSuggestions(!showSuggestions)
   }
 
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode)
+  }
+
   return (
-    <div className="fixed bottom-0 right-0 left-0 sm:bottom-8 sm:right-8 sm:left-auto z-50">
+    <div className={`fixed bottom-0 right-0 left-0 sm:bottom-8 sm:right-8 sm:left-auto z-50 ${isDarkMode ? 'dark' : ''}`}>
       {isOpen ? (
-        <Card className="w-full sm:w-[400px] md:w-[500px] lg:w-[600px] h-[90vh] sm:h-[800px] flex flex-col shadow-lg rounded-none sm:rounded-lg">
-          <CardHeader className="flex flex-row items-center justify-between p-4 bg-purple-600 text-white">
+        <Card className="w-full sm:w-[400px] md:w-[500px] lg:w-[600px] h-[90vh] sm:h-[800px] flex flex-col shadow-lg rounded-none sm:rounded-lg dark:bg-gray-800">
+          <CardHeader className="flex flex-row items-center justify-between p-4 bg-purple-600 dark:bg-purple-800 text-white">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-purple-600">
                 <Bot size={20} />
@@ -119,6 +170,9 @@ export default function ChatWidget() {
               <h3 className="text-lg font-semibold">AI Assistant</h3>
             </div>
             <div className="flex space-x-2">
+              <Button variant="ghost" size="icon" onClick={toggleDarkMode} className="text-white hover:bg-purple-700">
+                {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              </Button>
               <Button variant="ghost" size="icon" onClick={clearMessages} className="text-white hover:bg-purple-700">
                 <Trash2 className="h-5 w-5" />
               </Button>
@@ -127,43 +181,62 @@ export default function ChatWidget() {
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="flex-grow overflow-auto p-4 space-y-4">
+          <CardContent ref={chatContentRef} className="flex-grow overflow-auto p-4 space-y-4 dark:bg-gray-700">
             {messages.map((msg, index) => (
               <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[80%] p-3 rounded-lg text-sm ${
-                  msg.sender === 'user' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-800'
+                <div className={`max-w-[80%] p-3 rounded-lg text-sm relative ${
+                  msg.sender === 'user' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-white'
                 }`}>
                   {msg.text}
+                  <div className={`absolute bottom-0 ${msg.sender === 'user' ? 'right-0 mr-[-8px]' : 'left-0 ml-[-8px]'} w-3 h-3 transform rotate-45 ${
+                    msg.sender === 'user' ? 'bg-purple-600' : 'bg-gray-200 dark:bg-gray-600'
+                  }`}></div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {format(msg.timestamp, 'HH:mm')}
+                  </div>
                 </div>
               </div>
             ))}
-            {isLoading && (
+            {isTyping && (
               <div className="flex justify-start">
-                <div className="bg-gray-200 text-gray-800 p-3 rounded-lg text-sm">
-                  Thinking...
+                <div className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white p-3 rounded-lg text-sm">
+                  <div className="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
                 </div>
               </div>
             )}
             <div ref={messagesEndRef} />
           </CardContent>
-          <div className="border-t">
+          {showScrollButton && (
+            <Button
+              onClick={scrollToBottom}
+              className="absolute bottom-20 right-4 rounded-full bg-purple-600 hover:bg-purple-700 text-white"
+              size="icon"
+            >
+              <ChevronDownCircle className="h-5 w-5" />
+            </Button>
+          )}
+          <div className="border-t dark:border-gray-600">
             <Button
               onClick={toggleSuggestions}
               variant="ghost"
-              className="w-full flex justify-between items-center py-2 px-4 text-sm text-gray-600"
+              className="w-full flex justify-between items-center py-2 px-4 text-sm text-gray-600 dark:text-gray-300"
             >
               Suggested questions
               {showSuggestions ? <ChevronDown size={20} /> : <ChevronUp size={20} />}
             </Button>
             {showSuggestions && (
-              <div className="p-4 space-y-2 bg-gray-50">
+              <div className="p-4 space-y-2 bg-gray-50 dark:bg-gray-700">
                 {sampleMessages.map((message, index) => (
                   <Button
                     key={index}
                     variant="outline"
                     size="sm"
                     onClick={() => handleSampleMessage(message)}
-                    className="w-full text-xs justify-start h-auto py-2 px-3"
+                    className="w-full text-xs justify-start h-auto py-2 px-3 dark:text-gray-300 dark:hover:bg-gray-600"
                     disabled={isLoading}
                   >
                     {message}
@@ -172,16 +245,16 @@ export default function ChatWidget() {
               </div>
             )}
           </div>
-          <CardFooter className="border-t p-4">
+          <CardFooter className="border-t p-4 dark:border-gray-600">
             <form onSubmit={sendMessage} className="flex w-full gap-2">
               <Input
                 placeholder="Type your message..."
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                className="flex-grow text-sm"
+                className="flex-grow text-sm dark:bg-gray-700 dark:text-white"
                 disabled={isLoading}
               />
-              <Button type="submit" size="icon" className="bg-purple-600 hover:bg-purple-700 h-10 w-10" disabled={isLoading}>
+              <Button type="submit" size="icon" className="bg-purple-600 hover:bg-purple-700 h-10 w-10 dark:bg-purple-800 dark:hover:bg-purple-900" disabled={isLoading}>
                 <Send className="h-5 w-5" />
               </Button>
             </form>
@@ -190,14 +263,14 @@ export default function ChatWidget() {
       ) : (
         <div className="relative flex flex-col items-end p-4">
           {showWelcomeMessage && (
-            <div className="mb-2 p-3 bg-white rounded-lg shadow-lg text-sm whitespace-nowrap animate-fade-in-down">
-              Hi there! 👋 Need any help? I'm here to assist you!
+            <div className="mb-2 p-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-sm whitespace-nowrap animate-fade-in-down dark:text-white">
+            Hi there! 👋 Need any help? I&apos;m here to assist you!
             </div>
           )}
           <Button 
             onClick={toggleChat} 
             size="icon" 
-            className="rounded-full h-14 w-14 bg-purple-600 hover:bg-purple-700 shadow-lg animate-pulse"
+            className="rounded-full h-14 w-14 bg-purple-600 hover:bg-purple-700 shadow-lg animate-pulse dark:bg-purple-800 dark:hover:bg-purple-900"
           >
             <Bot size={24} className="text-white" />
           </Button>
