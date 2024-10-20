@@ -79,24 +79,25 @@ export default function ChatWidget() {
         const prediction = await client.createPrediction({
           chatflowId: 'eb2df04d-9584-423b-bfc4-7cb61ffc6826',
           question: inputMessage,
-          streaming: true,
+          streaming: false,
         });
 
-        let botResponse = '';
-        for await (const chunk of prediction) {
-          if (chunk.event === 'token') {
-            botResponse += chunk.data;
-            setMessages(prev => {
-              const newMessages = [...prev];
-              if (newMessages[newMessages.length - 1].sender === 'bot') {
-                newMessages[newMessages.length - 1].text = botResponse;
-              } else {
-                newMessages.push({ text: botResponse, sender: 'bot', timestamp: new Date() });
-              }
-              return newMessages;
-            });
-          }
-        }
+        let botResponse = prediction.text;
+        setMessages(prev => [...prev, { text: botResponse, sender: 'bot', timestamp: new Date() }])
+        // for await (const chunk of prediction) {
+        //   if (chunk.event === 'token') {
+        //     botResponse += chunk.data;
+        //     setMessages(prev => {
+        //       const newMessages = [...prev];
+        //       if (newMessages[newMessages.length - 1].sender === 'bot') {
+        //         newMessages[newMessages.length - 1].text = botResponse;
+        //       } else {
+        //         newMessages.push({ text: botResponse, sender: 'bot', timestamp: new Date() });
+        //       }
+        //       return newMessages;
+        //     });
+        //   }
+        // }
       } catch (error) {
         console.error('Error fetching response:', error)
         const errorMessage = { text: "Sorry, I'm having trouble responding right now. Please try again later.", sender: 'bot' as const, timestamp: new Date() }
@@ -118,24 +119,27 @@ export default function ChatWidget() {
       const prediction = await client.createPrediction({
         chatflowId: 'eb2df04d-9584-423b-bfc4-7cb61ffc6826', // Replace with your actual chatflow ID
         question: message,
-        streaming: true,
+        streaming: false,
       });
+      console.log(prediction)
 
-      let botResponse = '';
-      for await (const chunk of prediction) {
-        if (chunk.event === 'token') {
-          botResponse += chunk.data;
-          setMessages(prev => {
-            const newMessages = [...prev];
-            if (newMessages[newMessages.length - 1].sender === 'bot') {
-              newMessages[newMessages.length - 1].text = botResponse;
-            } else {
-              newMessages.push({ text: botResponse, sender: 'bot', timestamp: new Date() });
-            }
-            return newMessages;
-          });
-        }
-      }
+      // let botResponse = '';
+      // for await (const chunk of prediction) {
+      //   if (chunk.event === 'token') {
+      //     botResponse += chunk.data;
+      //     setMessages(prev => {
+      //       const newMessages = [...prev];
+      //       if (newMessages[newMessages.length - 1].sender === 'bot') {
+      //         newMessages[newMessages.length - 1].text = botResponse;
+      //       } else {
+      //         newMessages.push({ text: botResponse, sender: 'bot', timestamp: new Date() });
+      //       }
+      //       return newMessages;
+      //     });
+      //   }
+      // }
+      const botResponse = prediction.text; // Accessing the text property
+      setMessages(prev => [...prev, { text: botResponse, sender: 'bot', timestamp: new Date() }])
     } catch (error) {
       console.error('Error fetching response:', error)
       const errorMessage = { text: "Sorry, I'm having trouble responding right now. Please try again later.", sender: 'bot' as const, timestamp: new Date() }
