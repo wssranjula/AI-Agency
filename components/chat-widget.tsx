@@ -8,7 +8,7 @@ import { Send, X, Trash2, Bot, ChevronUp, ChevronDown, ChevronDownCircle, Moon, 
 import { FlowiseClient } from 'flowise-sdk'
 import { format } from 'date-fns'
 
-const client = new FlowiseClient({ baseUrl: 'http://localhost:3000' });
+const client = new FlowiseClient({ baseUrl: 'https://no-name.app.flowiseai.com' });
 
 export default function ChatWidget() {
   const initialMessage = { text: "Welcome! I'm an AI assistant. How can I help you today?", sender: 'bot' as const, timestamp: new Date() }
@@ -77,7 +77,7 @@ export default function ChatWidget() {
 
       try {
         const prediction = await client.createPrediction({
-          chatflowId: 'ac249b08-f4ed-40d0-a493-94bba72a8d20',
+          chatflowId: 'eb2df04d-9584-423b-bfc4-7cb61ffc6826',
           question: inputMessage,
           streaming: true,
         });
@@ -116,7 +116,7 @@ export default function ChatWidget() {
 
     try {
       const prediction = await client.createPrediction({
-        chatflowId: 'ac249b08-f4ed-40d0-a493-94bba72a8d20', // Replace with your actual chatflow ID
+        chatflowId: 'eb2df04d-9584-423b-bfc4-7cb61ffc6826', // Replace with your actual chatflow ID
         question: message,
         streaming: true,
       });
