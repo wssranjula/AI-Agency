@@ -11,7 +11,7 @@ import { format } from 'date-fns'
 const client = new FlowiseClient({ baseUrl: 'https://no-name.app.flowiseai.com' });
 
 export default function ChatWidget() {
-  const initialMessage = { text: "Welcome! I'm an AI assistant. How can I help you today?", sender: 'bot' as const, timestamp: new Date() }
+  const initialMessage = { text: "Welcome to Inreliflow! I'm your AI assistant. How can I help you today?", sender: 'bot' as const, timestamp: new Date() }
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<{ text: string; sender: 'user' | 'bot'; timestamp: Date }[]>([initialMessage])
   const [inputMessage, setInputMessage] = useState('')

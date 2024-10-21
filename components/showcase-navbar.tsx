@@ -32,8 +32,8 @@ xl:w-4/5
     >
       <Link href="/">
       <Image
-        src="/logo/in2.webp"
-        alt="Bird Logo"
+        src="/logo/l1.png"
+        alt="Intelli Logo"
         width={1000}
         height={1000}
         className="w-28"
