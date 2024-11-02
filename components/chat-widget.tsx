@@ -11,7 +11,7 @@ import { format } from 'date-fns'
 const client = new FlowiseClient({ baseUrl: 'https://no-name.app.flowiseai.com' });
 
 export default function ChatWidget() {
-  const initialMessage = { text: "Welcome to Inreliflow! I'm your AI assistant. How can I help you today?", sender: 'bot' as const, timestamp: new Date() }
+  const initialMessage = { text: "Welcome to Intelliflow! I'm your AI assistant. How can I help you today?", sender: 'bot' as const, timestamp: new Date() }
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<{ text: string; sender: 'user' | 'bot'; timestamp: Date }[]>([initialMessage])
   const [inputMessage, setInputMessage] = useState('')
@@ -77,7 +77,7 @@ export default function ChatWidget() {
 
       try {
         const prediction = await client.createPrediction({
-          chatflowId: 'eb2df04d-9584-423b-bfc4-7cb61ffc6826',
+          chatflowId: 'ebca503a-dfdd-4bc7-a613-415a5108d51e',
           question: inputMessage,
           streaming: false,
         });
@@ -117,7 +117,7 @@ export default function ChatWidget() {
 
     try {
       const prediction = await client.createPrediction({
-        chatflowId: 'eb2df04d-9584-423b-bfc4-7cb61ffc6826', // Replace with your actual chatflow ID
+        chatflowId: 'ebca503a-dfdd-4bc7-a613-415a5108d51e', // Replace with your actual chatflow ID
         question: message,
         streaming: false,
       });
