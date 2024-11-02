@@ -11,7 +11,7 @@ const config = {
   prefix: "",
   theme: {
   	container: {
-  		center: true,
+  		center: 'true',
   		padding: '2rem',
   		screens: {
   			'2xl': '1400px'
@@ -95,10 +95,10 @@ const config = {
   			},
   			shine: {
   				from: {
-  					'backgroundPosition': '0 0'
+  					backgroundPosition: '0 0'
   				},
   				to: {
-  					'backgroundPosition': '-200% 0'
+  					backgroundPosition: '-200% 0'
   				}
   			},
   			rainbow: {
@@ -108,6 +108,22 @@ const config = {
   				'100%': {
   					'background-position': '200%'
   				}
+  			},
+  			marquee: {
+  				from: {
+  					transform: 'translateX(0)'
+  				},
+  				to: {
+  					transform: 'translateX(calc(-100% - var(--gap)))'
+  				}
+  			},
+  			'marquee-vertical': {
+  				from: {
+  					transform: 'translateY(0)'
+  				},
+  				to: {
+  					transform: 'translateY(calc(-100% - var(--gap)))'
+  				}
   			}
   		},
   		animation: {
@@ -116,7 +132,9 @@ const config = {
   			scroll: 'scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite',
   			shimmer: 'shimmer 8s infinite',
   			shine: 'shine 2s  linear infinite',
-  			rainbow: 'rainbow var(--speed, 2s) infinite linear'
+  			rainbow: 'rainbow var(--speed, 2s) infinite linear',
+  			marquee: 'marquee var(--duration) infinite linear',
+  			'marquee-vertical': 'marquee-vertical var(--duration) linear infinite'
   		}
   	}
   },

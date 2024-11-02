@@ -18,7 +18,7 @@ import LetsMakeThingsHappenSection from "@/components/ui/lets-make-things-happen
 import ChatWidget from "@/components/chat-widget";
 import { AnimatedBeamMultipleOutputDemo } from "@/components/demos/animated-beam-demo";
 import BoxRevealDemo from "@/components/demos/box-reveal-demo";
-
+import TestimonialsSection from '@/components/testimonials-section'
 const services = [
   {
     icon: "/images/s_6.png",
@@ -359,7 +359,7 @@ export default function Component() {
           </section>
         </Element>
 
-        <Element name="testimonials">
+        {/* <Element name="testimonials">
           <section className="bg-gray-100 py-16">
             <div className="md:flex items-center justify-center space-y-6 md:space-y-0 md:gap-x-20 xl:w-4/5 2xl:w-[68%] mx-auto px-6 md:px-0">
               <div className="flex flex-col gap-y-5 md:w-1/2">
@@ -397,6 +397,9 @@ export default function Component() {
               </div>
             </div>
           </section>
+        </Element> */}
+        <Element name="testimonials">
+          <TestimonialsSection />
         </Element>
 
         <Element name="guarentees">
